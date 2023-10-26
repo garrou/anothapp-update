@@ -2,8 +2,8 @@ package main
 
 import (
 	"anothapp_update/database"
+	"anothapp_update/helpers"
 	"anothapp_update/repositories"
-	"fmt"
 )
 
 func main() {
@@ -14,16 +14,5 @@ func main() {
 	seasonRows := repositories.GetSeasonsWithNoPicture()
 	defer seasonRows.Close()
 
-	var number, episode, epDuration, showId int
-	var image string
-
-	for seasonRows.Next() {
-
-		err := seasonRows.Scan(&number, &episode, &epDuration, &image, &showId)
-		if err != nil {
-			panic(err.Error())
-		}
-
-		fmt.Println(number, episode, epDuration, showId, image)
-	}
+	seasons := helpers.CompareSeasons(seasonRows)
 }
