@@ -15,4 +15,5 @@ func main() {
 	defer seasonRows.Close()
 
 	seasons := helpers.CompareSeasons(seasonRows)
+	repositories.UpdateSeasons(seasons)
 }

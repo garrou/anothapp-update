@@ -27,7 +27,7 @@ func CompareSeasons(rows *sql.Rows) []models.Season {
 		}
 
 		for _, s := range seasonInfos.Seasons {
-			if s.Number == number {
+			if s.Number == number && s.Image != "" {
 				seasons = append(seasons, models.Season{
 					ShowId:   showId,
 					Number:   s.Number,

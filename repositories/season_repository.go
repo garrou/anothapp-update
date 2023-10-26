@@ -4,6 +4,7 @@ import (
 	"anothapp_update/database"
 	"anothapp_update/models"
 	"database/sql"
+	"fmt"
 )
 
 func GetSeasonsWithNoPicture() *sql.Rows {
@@ -18,4 +19,12 @@ func GetSeasonsWithNoPicture() *sql.Rows {
 
 func UpdateSeasons(seasons []models.Season) {
 
+	query := ""
+
+	for _, s := range seasons {
+		query += fmt.Sprintf("UPDATE seasons SET image = '%s', episode = %d WHERE show_id = %d AND number = %d;\n", s.Image, s.Episodes, s.ShowId, s.Number)
+	}
+	if _, err := database.Db.Query(query); err != nil {
+		panic(err)
+	}
 }
