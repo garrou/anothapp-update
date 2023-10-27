@@ -8,7 +8,7 @@ import (
 )
 
 func GetSeasonsWithNoPicture() *sql.Rows {
-	queryStmt := "SELECT number, episode, image, show_id FROM seasons WHERE image IS NULL"
+	queryStmt := "SELECT number, episode, image, show_id FROM seasons"
 	rows, err := database.Db.Query(queryStmt)
 
 	if err != nil {
