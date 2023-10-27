@@ -9,14 +9,15 @@ import (
 )
 
 func CompareSeasons(rows *sql.Rows) []models.Season {
-	var number, showId int
+	var number, episode, showId int
+	var image interface{}
 	var seasonInfos models.SeasonInfos
 	var seasons []models.Season
 	apiKey := os.Getenv("BETASERIES_KEY")
 
 	for rows.Next() {
 
-		err := rows.Scan(&number, &showId)
+		err := rows.Scan(&number, &episode, &image, &showId)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -27,7 +28,7 @@ func CompareSeasons(rows *sql.Rows) []models.Season {
 		}
 
 		for _, s := range seasonInfos.Seasons {
-			if s.Number == number && s.Image != "" {
+			if s.Number == number && (s.Image != image || s.Episodes != episode) {
 				seasons = append(seasons, models.Season{
 					ShowId:   showId,
 					Number:   s.Number,
