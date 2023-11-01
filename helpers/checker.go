@@ -8,35 +8,62 @@ import (
 	"os"
 )
 
-func CompareSeasons(rows *sql.Rows) []models.Season {
+func RowsToSeasons(rows *sql.Rows) []models.Season {
+
 	var number, episode, showId int
 	var image interface{}
-	var seasonInfos models.SeasonInfos
 	var seasons []models.Season
-	apiKey := os.Getenv("BETASERIES_KEY")
 
 	for rows.Next() {
 
 		err := rows.Scan(&number, &episode, &image, &showId)
+
 		if err != nil {
 			panic(err.Error())
 		}
-		body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d&key=%s", showId, apiKey))
-
-		if err := json.Unmarshal(body, &seasonInfos); err != nil {
-			panic(err.Error())
-		}
-
-		for _, s := range seasonInfos.Seasons {
-			if s.Number == number && (s.Image != image || s.Episodes != episode) {
-				seasons = append(seasons, models.Season{
-					ShowId:   showId,
-					Number:   s.Number,
-					Episodes: s.Episodes,
-					Image:    s.Image,
-				})
-			}
-		}
+		seasons = append(seasons, models.Season{
+			Number:   number,
+			Episodes: episode,
+			Image:    fmt.Sprintf("%v", image),
+			ShowId:   showId,
+		})
 	}
 	return seasons
+}
+
+func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) {
+
+	var previous int
+	var current models.SeasonInfos
+	var toUpdate []models.Season
+	var toDelete []models.Season
+	apiKey := os.Getenv("BETASERIES_KEY")
+
+	for _, season := range seasons {
+
+		if previous != season.ShowId {
+			body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d&key=%s", season.ShowId, apiKey))
+			current.Seasons = nil
+
+			if err := json.Unmarshal(body, &current); err != nil {
+				panic(err.Error())
+			}
+		}
+		if season.Number > len(current.Seasons) {
+			toDelete = append(toDelete, season)
+			continue
+		}
+		s := current.Seasons[season.Number-1]
+
+		if season.Number == s.Number && (season.Episodes != s.Episodes || season.Image != s.Image) {
+			toUpdate = append(toUpdate, models.Season{
+				ShowId:   season.ShowId,
+				Number:   s.Number,
+				Episodes: s.Episodes,
+				Image:    s.Image,
+			})
+		}
+		previous = season.ShowId
+	}
+	return toUpdate, toDelete
 }

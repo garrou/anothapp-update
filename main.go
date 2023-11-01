@@ -11,9 +11,11 @@ func main() {
 	database.Open()
 	defer database.Close()
 
-	seasonRows := repositories.GetSeasonsWithNoPicture()
+	seasonRows := repositories.GetSeasons()
 	defer seasonRows.Close()
 
-	seasons := helpers.CompareSeasons(seasonRows)
-	repositories.UpdateSeasons(seasons)
+	seasons := helpers.RowsToSeasons(seasonRows)
+	toUpdate, toDelete := helpers.CompareSeasons(seasons)
+	repositories.DeleteSeasons(toDelete)
+	repositories.UpdateSeasons(toUpdate)
 }
