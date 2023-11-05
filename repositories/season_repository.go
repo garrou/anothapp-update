@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"anothapp_update/database"
+	"anothapp_update/helpers"
 	"anothapp_update/models"
 	"database/sql"
 	"fmt"
@@ -12,14 +13,14 @@ func GetSeasons() *sql.Rows {
 	rows, err := database.Db.Query(queryStmt)
 
 	if err != nil {
-		panic(err.Error())
+		panic(err)
 	}
 	return rows
 }
 
 func DeleteSeasons(seasons []models.Season) {
 
-	fmt.Printf("%d seasons to delete\n", len(seasons))
+	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons to delete", len(seasons)))
 
 	query := ""
 
@@ -33,7 +34,7 @@ func DeleteSeasons(seasons []models.Season) {
 
 func UpdateSeasons(seasons []models.Season) {
 
-	fmt.Printf("%d seasons to update\n", len(seasons))
+	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons to update", len(seasons)))
 
 	query := ""
 

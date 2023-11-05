@@ -4,10 +4,17 @@ import (
 	"anothapp_update/database"
 	"anothapp_update/helpers"
 	"anothapp_update/repositories"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 
+	errEnv := godotenv.Load()
+
+	if errEnv != nil {
+		panic(errEnv)
+	}
 	database.Open()
 	defer database.Close()
 

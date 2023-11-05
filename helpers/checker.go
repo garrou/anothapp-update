@@ -2,34 +2,10 @@ package helpers
 
 import (
 	"anothapp_update/models"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
 )
-
-func RowsToSeasons(rows *sql.Rows) []models.Season {
-
-	var number, episode, showId int
-	var image interface{}
-	var seasons []models.Season
-
-	for rows.Next() {
-
-		err := rows.Scan(&number, &episode, &image, &showId)
-
-		if err != nil {
-			panic(err.Error())
-		}
-		seasons = append(seasons, models.Season{
-			Number:   number,
-			Episodes: episode,
-			Image:    fmt.Sprintf("%v", image),
-			ShowId:   showId,
-		})
-	}
-	return seasons
-}
 
 func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) {
 
@@ -37,16 +13,15 @@ func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) 
 	var current models.SeasonInfos
 	var toUpdate []models.Season
 	var toDelete []models.Season
-	apiKey := os.Getenv("BETASERIES_KEY")
 
 	for _, season := range seasons {
 
 		if previous != season.ShowId {
-			body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d&key=%s", season.ShowId, apiKey))
+			body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d&key=%s", season.ShowId, os.Getenv("BETASERIES_KEY")))
 			current.Seasons = nil
 
 			if err := json.Unmarshal(body, &current); err != nil {
-				panic(err.Error())
+				panic(err)
 			}
 		}
 		if season.Number > len(current.Seasons) {
