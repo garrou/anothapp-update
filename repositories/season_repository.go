@@ -31,7 +31,7 @@ func DeleteSeasons(seasons []models.Season) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
-	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons deleted", len(seasons)))
+	helpers.SendTelegramMessage(fmt.Sprintf("%d deleted season(s)", len(seasons)))
 }
 
 func UpdateSeasons(seasons []models.Season) {
@@ -51,5 +51,5 @@ func UpdateSeasons(seasons []models.Season) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
-	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons updated", len(seasons)))
+	helpers.SendTelegramMessage(fmt.Sprintf("%d updated season(s)", len(seasons)))
 }
