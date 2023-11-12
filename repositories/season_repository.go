@@ -20,8 +20,9 @@ func GetSeasons() *sql.Rows {
 
 func DeleteSeasons(seasons []models.Season) {
 
-	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons to delete", len(seasons)))
-
+	if len(seasons) == 0 {
+		return
+	}
 	query := ""
 
 	for _, s := range seasons {
@@ -30,12 +31,14 @@ func DeleteSeasons(seasons []models.Season) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
+	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons deleted", len(seasons)))
 }
 
 func UpdateSeasons(seasons []models.Season) {
 
-	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons to update", len(seasons)))
-
+	if len(seasons) == 0 {
+		return
+	}
 	query := ""
 
 	for _, s := range seasons {
@@ -48,4 +51,5 @@ func UpdateSeasons(seasons []models.Season) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
+	helpers.SendTelegramMessage(fmt.Sprintf("%d seasons updated", len(seasons)))
 }
