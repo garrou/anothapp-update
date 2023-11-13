@@ -19,10 +19,13 @@ func RowsToSeasons(rows *sql.Rows) []models.Season {
 		if err != nil {
 			panic(err)
 		}
+		if image == nil {
+			image = ""
+		}
 		seasons = append(seasons, models.Season{
 			Number:   number,
 			Episodes: episode,
-			Image:    fmt.Sprintf("%v", image),
+			Image:    fmt.Sprintf("%s", image),
 			ShowId:   showId,
 		})
 	}
