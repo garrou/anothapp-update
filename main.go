@@ -23,6 +23,5 @@ func main() {
 
 	seasons := helpers.RowsToSeasons(seasonRows)
 	toUpdate, toDelete := helpers.CompareSeasons(seasons)
-	repositories.DeleteSeasons(toDelete)
-	repositories.UpdateSeasons(toUpdate)
+	repositories.UpdateSeasons(toUpdate, toDelete)
 }

@@ -18,7 +18,21 @@ func GetSeasons() *sql.Rows {
 	return rows
 }
 
-func DeleteSeasons(seasons []models.Season) {
+func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) {
+
+	deleted := len(toDelete)
+	updated := len(toUpdate)
+
+	if deleted+updated == 0 {
+		helpers.SendTelegramMessage("All seasons are up to date")
+		return
+	}
+	deleteSeasons(toDelete)
+	updateSeasons(toUpdate)
+	helpers.SendTelegramMessage(fmt.Sprintf("%d deleted season(s), %d updated season(s)", deleted, updated))
+}
+
+func deleteSeasons(seasons []models.Season) {
 
 	if len(seasons) == 0 {
 		return
@@ -31,10 +45,9 @@ func DeleteSeasons(seasons []models.Season) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
-	helpers.SendTelegramMessage(fmt.Sprintf("%d deleted season(s)", len(seasons)))
 }
 
-func UpdateSeasons(seasons []models.Season) {
+func updateSeasons(seasons []models.Season) {
 
 	if len(seasons) == 0 {
 		return
@@ -51,5 +64,4 @@ func UpdateSeasons(seasons []models.Season) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
-	helpers.SendTelegramMessage(fmt.Sprintf("%d updated season(s)", len(seasons)))
 }
