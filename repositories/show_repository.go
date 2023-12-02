@@ -9,7 +9,7 @@ import (
 )
 
 func GetShows() *sql.Rows {
-	query := "SELECT id, kinds FROM shows"
+	query := "SELECT id, kinds FROM shows WHERE kinds IS NULL"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
