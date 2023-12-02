@@ -9,8 +9,8 @@ import (
 )
 
 func GetSeasons() *sql.Rows {
-	queryStmt := "SELECT number, episode, image, show_id FROM seasons ORDER BY show_id, number"
-	rows, err := database.Db.Query(queryStmt)
+	query := "SELECT number, episode, image, show_id FROM seasons ORDER BY show_id, number"
+	rows, err := database.Db.Query(query)
 
 	if err != nil {
 		panic(err)
