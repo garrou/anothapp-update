@@ -2,13 +2,14 @@ package repositories
 
 import (
 	"anothapp_update/database"
+	"anothapp_update/helpers"
 	"anothapp_update/models"
 	"database/sql"
 	"fmt"
 )
 
 func GetShows() *sql.Rows {
-	query := "SELECT id, kinds FROM shows LIMIT 5"
+	query := "SELECT id, kinds FROM shows"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
@@ -18,6 +19,12 @@ func GetShows() *sql.Rows {
 }
 
 func UpdateShows(shows []models.Show) {
+
+	updated := len(shows)
+
+	if updated == 0 {
+		return
+	}
 	query := ""
 
 	for _, s := range shows {
@@ -26,4 +33,5 @@ func UpdateShows(shows []models.Show) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
+	helpers.SendTelegramMessage(fmt.Sprintf("%d updated show(s)", updated))
 }

@@ -18,10 +18,17 @@ func main() {
 	database.Open()
 	defer database.Close()
 
+	showRows := repositories.GetShows()
+	defer showRows.Close()
+
+	shows := helpers.RowsToShows(showRows)
+	showsToUp := helpers.CompareShows(shows)
+	repositories.UpdateShows(showsToUp)
+
 	seasonRows := repositories.GetSeasons()
 	defer seasonRows.Close()
 
 	seasons := helpers.RowsToSeasons(seasonRows)
-	toUpdate, toDelete := helpers.CompareSeasons(seasons)
-	repositories.UpdateSeasons(toUpdate, toDelete)
+	seasonsToUp, seasonstoDel := helpers.CompareSeasons(seasons)
+	repositories.UpdateSeasons(seasonsToUp, seasonstoDel)
 }
