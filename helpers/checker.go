@@ -20,11 +20,10 @@ func mapToString(m map[string]string) string {
 func CompareShows(shows []models.Show) []models.Show {
 
 	var toUpdate []models.Show
-	var current models.ShowInfo
 
 	for _, show := range shows {
 		body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/display?id=%d&key=%s", show.Id, os.Getenv("BETASERIES_KEY")))
-		current = models.ShowInfo{}
+		current := models.ShowInfo{}
 
 		if err := json.Unmarshal(body, &current); err != nil {
 			panic(err)
