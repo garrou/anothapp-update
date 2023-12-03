@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func mapToString(m map[string]string) string {
@@ -14,7 +15,7 @@ func mapToString(m map[string]string) string {
 	for _, element := range m {
 		s += element + ";"
 	}
-	return s
+	return strings.TrimSuffix(s, ";")
 }
 
 func CompareShows(shows []models.Show) []models.Show {
