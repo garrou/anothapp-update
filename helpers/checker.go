@@ -21,9 +21,10 @@ func mapToString(m map[string]string) string {
 func CompareShows(shows []models.Show) []models.Show {
 
 	var toUpdate []models.Show
+	apiKey := os.Getenv("BETASERIES_KEY")
 
 	for _, show := range shows {
-		body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/display?id=%d", show.Id), os.Getenv("BETASERIES_KEY"))
+		body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/display?id=%d", show.Id), apiKey)
 		current := models.ShowInfo{}
 
 		if err := json.Unmarshal(body, &current); err != nil {
@@ -48,11 +49,12 @@ func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) 
 	var current models.SeasonInfos
 	var toUpdate []models.Season
 	var toDelete []models.Season
+	apiKey := os.Getenv("BETASERIES_KEY")
 
 	for _, season := range seasons {
 
 		if previous != season.ShowId {
-			body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d", season.ShowId), os.Getenv("BETASERIES_KEY"))
+			body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d", season.ShowId), apiKey)
 			current.Seasons = nil
 
 			if err := json.Unmarshal(body, &current); err != nil {
