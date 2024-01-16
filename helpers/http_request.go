@@ -6,8 +6,11 @@ import (
 	"net/http"
 )
 
-func HttpGet(url string) []byte {
-	resp, getErr := http.Get(url)
+func HttpGet(url, key string) []byte {
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("X-BetaSeries-Key", key)
+	resp, getErr := client.Do(req)
 
 	if getErr != nil {
 		panic(getErr)

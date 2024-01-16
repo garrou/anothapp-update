@@ -23,7 +23,7 @@ func CompareShows(shows []models.Show) []models.Show {
 	var toUpdate []models.Show
 
 	for _, show := range shows {
-		body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/display?id=%d&key=%s", show.Id, os.Getenv("BETASERIES_KEY")))
+		body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/display?id=%d", show.Id), os.Getenv("BETASERIES_KEY"))
 		current := models.ShowInfo{}
 
 		if err := json.Unmarshal(body, &current); err != nil {
@@ -52,7 +52,7 @@ func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) 
 	for _, season := range seasons {
 
 		if previous != season.ShowId {
-			body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d&key=%s", season.ShowId, os.Getenv("BETASERIES_KEY")))
+			body := HttpGet(fmt.Sprintf("https://api.betaseries.com/shows/seasons?id=%d", season.ShowId), os.Getenv("BETASERIES_KEY"))
 			current.Seasons = nil
 
 			if err := json.Unmarshal(body, &current); err != nil {
