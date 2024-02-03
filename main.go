@@ -56,5 +56,11 @@ func updateSeasons() {
 
 	seasons := helpers.RowsToSeasons(seasonRows)
 	seasonsToUp, seasonsToDel := helpers.CompareSeasons(seasons)
-	repositories.UpdateSeasons(seasonsToUp, seasonsToDel)
+	updated := repositories.UpdateSeasons(seasonsToUp, seasonsToDel)
+
+	if updated {
+		helpers.SendTelegramMessage(helpers.FormatMsg(seasonsToUp, seasonsToDel))
+	} else {
+		helpers.SendTelegramMessage("All seasons are up to date")
+	}
 }

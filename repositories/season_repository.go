@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"anothapp_update/database"
-	"anothapp_update/helpers"
 	"anothapp_update/models"
 	"database/sql"
 	"fmt"
@@ -18,18 +17,14 @@ func GetSeasons() *sql.Rows {
 	return rows
 }
 
-func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) {
+func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) bool {
 
-	deleted := len(toDelete)
-	updated := len(toUpdate)
-
-	if deleted+updated == 0 {
-		helpers.SendTelegramMessage("All seasons are up to date")
-		return
+	if len(toUpdate)+len(toDelete) == 0 {
+		return false
 	}
 	deleteSeasons(toDelete)
 	updateSeasons(toUpdate)
-	helpers.SendTelegramMessage(fmt.Sprintf("%d deleted season(s), %d updated season(s)", deleted, updated))
+	return true
 }
 
 func deleteSeasons(seasons []models.Season) {
