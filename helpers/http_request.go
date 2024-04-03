@@ -6,6 +6,15 @@ import (
 	"net/http"
 )
 
+func SendTelegramMessage(message string) {
+	token := os.Getenv("TOKEN")
+	chatId := os.Getenv("CHAT_ID")
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
+	content := fmt.Sprintf(`{"chat_id": "%s", "text": "%s"}`, chatId, message)
+	body := bytes.NewBuffer([]byte(content))
+	httpPost(url, body)
+}
+
 func HttpGet(url, key string) []byte {
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
@@ -29,7 +38,7 @@ func HttpGet(url, key string) []byte {
 	return body
 }
 
-func HttpPost(url string, body *bytes.Buffer) {
+func httpPost(url string, body *bytes.Buffer) {
 	client := &http.Client{}
 	req, reqErr := http.NewRequest(http.MethodPost, url, body)
 

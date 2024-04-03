@@ -5,6 +5,17 @@ import (
 	"fmt"
 )
 
+func MapToString(m map[string]string) string {
+
+	s := ""
+
+	for _, element := range m {
+		s += element + ";"
+	}
+	return strings.TrimSuffix(s, ";")
+}
+
+
 func FormatMsg(seasonsToUp []models.Season, seasonsToDel []models.Season) string {
 	return format("UPDATED", seasonsToUp) + format("DELETED", seasonsToDel)
 }

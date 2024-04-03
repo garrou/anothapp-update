@@ -8,13 +8,14 @@ import (
 )
 
 func GetSeasons() *sql.Rows {
-	query := "SELECT number, episode, image, show_id FROM seasons ORDER BY show_id, number"
+	query := "SELECT number, episode, duration, image, show_id FROM seasons ORDER BY show_id, number"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
 		panic(err)
 	}
-	return rows
+	defer rows.Close()
+	return toSeasons(rows)
 }
 
 func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) bool {
@@ -25,6 +26,33 @@ func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) bool {
 	deleteSeasons(toDelete)
 	updateSeasons(toUpdate)
 	return true
+}
+
+func toSeasons(rows *sql.Rows) []models.Season {
+
+	var number, episodes, duration, showId int
+	var image interface{}
+	var seasons []models.Season
+
+	for rows.Next() {
+
+		err := rows.Scan(&number, &episodes, &duration, &image, &showId)
+
+		if err != nil {
+			panic(err)
+		}
+		if image == nil {
+			image = ""
+		}
+		seasons = append(seasons, models.Season{
+			Number:   number,
+			Episodes: episode,
+			Duration: duration,
+			Image:    fmt.Sprintf("%s", image),
+			ShowId:   showId,
+		})
+	}
+	return seasons
 }
 
 func deleteSeasons(seasons []models.Season) {
