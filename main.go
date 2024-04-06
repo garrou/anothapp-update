@@ -4,14 +4,14 @@ import (
 	"anothapp_update/database"
 	"anothapp_update/helpers"
 	"anothapp_update/repositories"
+	"anothapp_update/services"
+	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
-
 	arg := getArg(os.Args[1:])
 	errEnv := godotenv.Load()
 
@@ -42,25 +42,26 @@ func getArg(args []string) string {
 }
 
 func updateShows() {
-	showRows := repositories.GetShows()
-	defer showRows.Close()
+	shows := repositories.GetShows()
+	showsToUp := services.CompareShows(shows)
+	isShowsUp := repositories.UpdateShows(showsToUp)
 
-	shows := helpers.RowsToShows(showRows)
-	showsToUp := helpers.CompareShows(shows)
-	repositories.UpdateShows(showsToUp)
+	if isShowsUp {
+		helpers.SendTelegramMessage(helpers.Format("Series updated", showsToUp))
+	} else {
+		helpers.SendTelegramMessage("Series are up to date")
+	}
 }
 
 func updateSeasons() {
-	seasonRows := repositories.GetSeasons()
-	defer seasonRows.Close()
+	seasons := repositories.GetSeasons()
+	seasonsToUp, seasonsToDel := services.CompareSeasons(seasons)
+	isSeasonsUp := repositories.UpdateSeasons(seasonsToUp, seasonsToDel)
 
-	seasons := helpers.RowsToSeasons(seasonRows)
-	seasonsToUp, seasonsToDel := helpers.CompareSeasons(seasons)
-	updated := repositories.UpdateSeasons(seasonsToUp, seasonsToDel)
-
-	if updated {
-		helpers.SendTelegramMessage(helpers.FormatMsg(seasonsToUp, seasonsToDel))
+	if isSeasonsUp {
+		msg := fmt.Sprintln(helpers.Format("Seasons updated", seasonsToUp), helpers.Format("Seasons deleted", seasonsToDel))
+		helpers.SendTelegramMessage(msg)
 	} else {
-		helpers.SendTelegramMessage("All seasons are up to date")
+		helpers.SendTelegramMessage("Seasons are up to date")
 	}
 }

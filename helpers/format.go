@@ -1,23 +1,24 @@
 package helpers
 
 import (
-	"anothapp_update/models"
 	"fmt"
+	"strings"
 )
 
-func FormatMsg(seasonsToUp []models.Season, seasonsToDel []models.Season) string {
-	return format("UPDATED", seasonsToUp) + format("DELETED", seasonsToDel)
+func MapToString(m map[string]string) string {
+	s := ""
+
+	for _, element := range m {
+		s += element + ";"
+	}
+	return strings.TrimSuffix(s, ";")
 }
 
-func format(title string, seasons []models.Season) string {
+func Format[T any](title string, models []T) string {
+	s := fmt.Sprintf("%s\n\n", title)
 
-	if len(seasons) == 0 {
-		return ""
+	for _, model := range models {
+		s += fmt.Sprintln(model)
 	}
-	var msg = fmt.Sprintf("%s : ", title)
-
-	for _, n := range seasons {
-		msg += fmt.Sprintf("%d ", n.ShowId)
-	}
-	return fmt.Sprintln(msg)
+	return s
 }
