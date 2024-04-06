@@ -18,9 +18,9 @@ func GetShows() []models.Show {
 	return toShows(rows)
 }
 
-func UpdateShows(shows []models.Show) bool {
+func UpdateShows(shows []models.Show) {
 	if len(shows) == 0 {
-		return false
+		return
 	}
 	query := ""
 
@@ -30,7 +30,6 @@ func UpdateShows(shows []models.Show) bool {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
-	return true
 }
 
 func toShows(rows *sql.Rows) []models.Show {

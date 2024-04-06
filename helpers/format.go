@@ -14,11 +14,11 @@ func MapToString(m map[string]string) string {
 	return strings.TrimSuffix(s, ";")
 }
 
-func Format[T any](title string, models []T) string {
+func Format[T any](title string, items []T) string {
 	s := fmt.Sprintf("%s\n\n", title)
 
-	for _, model := range models {
-		s += fmt.Sprintln(model)
+	for _, item := range items {
+		s += fmt.Sprintln(item)
 	}
 	return s
 }

@@ -18,13 +18,12 @@ func GetSeasons() []models.Season {
 	return toSeasons(rows)
 }
 
-func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) bool {
+func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) {
 	if len(toUpdate)+len(toDelete) == 0 {
-		return false
+		return
 	}
 	deleteSeasons(toDelete)
 	updateSeasons(toUpdate)
-	return true
 }
 
 func toSeasons(rows *sql.Rows) []models.Season {

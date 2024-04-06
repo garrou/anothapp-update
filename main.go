@@ -6,15 +6,14 @@ import (
 	"anothapp_update/repositories"
 	"anothapp_update/services"
 	"fmt"
-	"log"
-	"os"
-
 	"github.com/joho/godotenv"
+	"os"
+	"time"
 )
 
 func main() {
-	arg, mode := getArgs(os.Args[1:])
-	errEnv := godotenv.Load(getEnvFile(mode))
+	mode := getEnvFile(os.Args[1:])
+	errEnv := godotenv.Load(mode)
 
 	if errEnv != nil {
 		panic(errEnv)
@@ -22,59 +21,32 @@ func main() {
 	database.Open()
 	defer database.Close()
 
-	switch arg {
-	case "shows":
-		updateShows()
-	case "seasons":
-		updateSeasons()
-	case "all":
-		updateShows()
-		updateSeasons()
-	default:
-		log.Fatal("Invalid argument")
-	}
+	filename := fmt.Sprintf("logs/%s.txt", time.Now().Format("20060102"))
+	helpers.Write(filename, fmt.Sprintf("File %s\n\n", mode))
+	updateShows(filename)
+	updateSeasons(filename)
 }
 
-func getEnvFile(mode string) string {
-	if mode == "prod" {
-		return "production.env"
+func getEnvFile(args []string) string {
+	if len(args) == 1 && args[0] == "prod" {
+		return "prod.env"
 	}
 	return ".env"
 }
 
-func getArgs(args []string) (string, string) {
-	size := len(args)
-
-	if size == 0 {
-		log.Fatal("Needs one argument")
-	}
-	if size == 2 {
-		return args[0], args[1]
-	}
-	return args[0], "dev"
-}
-
-func updateShows() {
+func updateShows(filename string) {
 	shows := repositories.GetShows()
 	showsToUp := services.CompareShows(shows)
-	isShowsUp := repositories.UpdateShows(showsToUp)
+	repositories.UpdateShows(showsToUp)
 
-	if isShowsUp {
-		helpers.SendTelegramMessage(helpers.Format("Series updated", showsToUp))
-	} else {
-		helpers.SendTelegramMessage("Series are up to date")
-	}
+	helpers.Write(filename, helpers.Format("Series updated", showsToUp))
 }
 
-func updateSeasons() {
+func updateSeasons(filename string) {
 	seasons := repositories.GetSeasons()
 	seasonsToUp, seasonsToDel := services.CompareSeasons(seasons)
-	isSeasonsUp := repositories.UpdateSeasons(seasonsToUp, seasonsToDel)
+	repositories.UpdateSeasons(seasonsToUp, seasonsToDel)
 
-	if isSeasonsUp {
-		msg := fmt.Sprintln(helpers.Format("Seasons updated", seasonsToUp), helpers.Format("Seasons deleted", seasonsToDel))
-		helpers.SendTelegramMessage(msg)
-	} else {
-		helpers.SendTelegramMessage("Seasons are up to date")
-	}
+	msg := fmt.Sprint(helpers.Format("Seasons updated", seasonsToUp), helpers.Format("Seasons deleted", seasonsToDel))
+	helpers.Write(filename, msg)
 }

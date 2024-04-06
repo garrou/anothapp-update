@@ -51,40 +51,34 @@ func CompareShows(shows []models.Show) []models.Show {
 func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) {
 	var toUpdate []models.Season
 	var toDelete []models.Season
-	var wg sync.WaitGroup
+	var current models.SeasonInfos
 	var apiKey = os.Getenv("BETASERIES_KEY")
+	var previous int
 
 	for _, season := range seasons {
-		wg.Add(1)
-		go func(show models.Season) {
-			defer wg.Done()
-			current := models.SeasonInfos{}
-			length := len(current.Seasons)
+		if season.ShowId != previous {
+			body := helpers.HttpGet(fmt.Sprintf("%s/seasons?id=%d", BaseUrl, season.ShowId), apiKey)
+			current.Seasons = nil
 
-			if length == 0 || (current.Seasons[0].ShowId != season.ShowId) {
-				body := helpers.HttpGet(fmt.Sprintf("%s/seasons?id=%d", BaseUrl, season.ShowId), apiKey)
-				current.Seasons = nil
+			if err := json.Unmarshal(body, &current); err != nil {
+				panic(err)
+			}
+		}
+		if season.Number > len(current.Seasons) {
+			toDelete = append(toDelete, season)
+			continue
+		}
+		currSeason := current.Seasons[season.Number-1]
 
-				if err := json.Unmarshal(body, &current); err != nil {
-					panic(err)
-				}
-			}
-			if season.Number > len(current.Seasons) {
-				toDelete = append(toDelete, season)
-				return
-			}
-			currSeason := current.Seasons[season.Number-1]
-
-			if season.Number == currSeason.Number && (season.Episodes != currSeason.Episodes || season.Image != currSeason.Image) {
-				toUpdate = append(toUpdate, models.Season{
-					ShowId:   season.ShowId,
-					Number:   currSeason.Number,
-					Episodes: currSeason.Episodes,
-					Image:    currSeason.Image,
-				})
-			}
-		}(season)
+		if season.Number == currSeason.Number && (season.Episodes != currSeason.Episodes || season.Image != currSeason.Image) {
+			toUpdate = append(toUpdate, models.Season{
+				ShowId:   season.ShowId,
+				Number:   currSeason.Number,
+				Episodes: currSeason.Episodes,
+				Image:    currSeason.Image,
+			})
+		}
+		previous = season.ShowId
 	}
-	wg.Wait()
 	return toUpdate, toDelete
 }
