@@ -6,17 +6,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 )
 
 const BaseUrl = "https://api.betaseries.com/shows"
 
-var apiKey = os.Getenv("BETASERIES_KEY")
-
 func CompareShows(shows []models.Show) []models.Show {
-
 	var toUpdate []models.Show
 	var wg sync.WaitGroup
+	var apiKey = os.Getenv("BETASERIES_KEY")
 
 	for _, show := range shows {
 		wg.Add(1)
@@ -28,15 +27,19 @@ func CompareShows(shows []models.Show) []models.Show {
 			if showErr := json.Unmarshal(body, &current); showErr != nil {
 				panic(showErr)
 			}
-			fmt.Println(current)
+			if current.Show.Id == 0 {
+				panic("Error during deserialization")
+			}
 			kinds := helpers.MapToString(current.Show.Kinds)
+			duration, _ := strconv.Atoi(current.Show.Duration)
 
-			if kinds != show.Kinds || show.Poster != current.Show.Images.Poster || show.Duration != current.Show.Duration {
+			if show.Poster != current.Show.Images.Poster || show.Duration != duration {
 				toUpdate = append(toUpdate, models.Show{
-					Id:       show.Id,
+					Id:       current.Show.Id,
+					Title:    current.Show.Title,
 					Kinds:    kinds,
 					Poster:   current.Show.Images.Poster,
-					Duration: current.Show.Duration,
+					Duration: duration,
 				})
 			}
 		}(show)
@@ -46,37 +49,42 @@ func CompareShows(shows []models.Show) []models.Show {
 }
 
 func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) {
-
-	var previous int
 	var toUpdate []models.Season
 	var toDelete []models.Season
-	var current models.SeasonInfos
+	var wg sync.WaitGroup
+	var apiKey = os.Getenv("BETASERIES_KEY")
 
 	for _, season := range seasons {
+		wg.Add(1)
+		go func(show models.Season) {
+			defer wg.Done()
+			current := models.SeasonInfos{}
+			length := len(current.Seasons)
 
-		if previous != season.ShowId {
-			body := helpers.HttpGet(fmt.Sprintf("%s/seasons?id=%d", BaseUrl, season.ShowId), apiKey)
-			current.Seasons = nil
+			if length == 0 || (current.Seasons[0].ShowId != season.ShowId) {
+				body := helpers.HttpGet(fmt.Sprintf("%s/seasons?id=%d", BaseUrl, season.ShowId), apiKey)
+				current.Seasons = nil
 
-			if err := json.Unmarshal(body, &current); err != nil {
-				panic(err)
+				if err := json.Unmarshal(body, &current); err != nil {
+					panic(err)
+				}
 			}
-		}
-		if season.Number > len(current.Seasons) {
-			toDelete = append(toDelete, season)
-			continue
-		}
-		currSeason := current.Seasons[season.Number-1]
+			if season.Number > len(current.Seasons) {
+				toDelete = append(toDelete, season)
+				return
+			}
+			currSeason := current.Seasons[season.Number-1]
 
-		if season.Number == currSeason.Number && (season.Episodes != currSeason.Episodes || season.Image != currSeason.Image) {
-			toUpdate = append(toUpdate, models.Season{
-				ShowId:   season.ShowId,
-				Number:   currSeason.Number,
-				Episodes: currSeason.Episodes,
-				Image:    currSeason.Image,
-			})
-		}
-		previous = season.ShowId
+			if season.Number == currSeason.Number && (season.Episodes != currSeason.Episodes || season.Image != currSeason.Image) {
+				toUpdate = append(toUpdate, models.Season{
+					ShowId:   season.ShowId,
+					Number:   currSeason.Number,
+					Episodes: currSeason.Episodes,
+					Image:    currSeason.Image,
+				})
+			}
+		}(season)
 	}
+	wg.Wait()
 	return toUpdate, toDelete
 }

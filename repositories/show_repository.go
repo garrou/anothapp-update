@@ -2,14 +2,13 @@ package repositories
 
 import (
 	"anothapp_update/database"
-	"anothapp_update/helpers"
 	"anothapp_update/models"
 	"database/sql"
 	"fmt"
 )
 
 func GetShows() []models.Show {
-	query := "SELECT id, poster, kinds, duration FROM shows LIMIT 5"
+	query := "SELECT id, title, poster, kinds, duration FROM shows"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
@@ -19,12 +18,9 @@ func GetShows() []models.Show {
 	return toShows(rows)
 }
 
-func UpdateShows(shows []models.Show) {
-
-	updated := len(shows)
-
-	if updated == 0 {
-		return
+func UpdateShows(shows []models.Show) bool {
+	if len(shows) == 0 {
+		return false
 	}
 	query := ""
 
@@ -34,29 +30,26 @@ func UpdateShows(shows []models.Show) {
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
 	}
-	helpers.SendTelegramMessage(fmt.Sprintf("%d updated show(s)", updated))
+	return true
 }
 
 func toShows(rows *sql.Rows) []models.Show {
-
 	var id, duration int
-	var poster string
+	var title, poster string
 	var kinds interface{}
 	var shows []models.Show
 
 	for rows.Next() {
 
-		err := rows.Scan(&id, &poster, &kinds, &duration)
+		err := rows.Scan(&id, &title, &poster, &kinds, &duration)
 
 		if err != nil {
 			panic(err)
 		}
 
-		if kinds == nil {
-			kinds = ""
-		}
 		shows = append(shows, models.Show{
 			Id:       id,
+			Title:    title,
 			Poster:   poster,
 			Kinds:    fmt.Sprintf("%s", kinds),
 			Duration: duration,

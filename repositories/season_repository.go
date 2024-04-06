@@ -19,7 +19,6 @@ func GetSeasons() []models.Season {
 }
 
 func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) bool {
-
 	if len(toUpdate)+len(toDelete) == 0 {
 		return false
 	}
@@ -29,7 +28,6 @@ func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) bool {
 }
 
 func toSeasons(rows *sql.Rows) []models.Season {
-
 	var number, episodes, duration, showId int
 	var image interface{}
 	var seasons []models.Season
@@ -56,7 +54,6 @@ func toSeasons(rows *sql.Rows) []models.Season {
 }
 
 func deleteSeasons(seasons []models.Season) {
-
 	if len(seasons) == 0 {
 		return
 	}
@@ -71,18 +68,13 @@ func deleteSeasons(seasons []models.Season) {
 }
 
 func updateSeasons(seasons []models.Season) {
-
 	if len(seasons) == 0 {
 		return
 	}
 	query := ""
 
 	for _, s := range seasons {
-		if s.Image == "" {
-			query += fmt.Sprintf("UPDATE seasons SET image = NULL, episode = %d WHERE show_id = %d AND number = %d;\n", s.Episodes, s.ShowId, s.Number)
-		} else {
-			query += fmt.Sprintf("UPDATE seasons SET image = '%s', episode = %d WHERE show_id = %d AND number = %d;\n", s.Image, s.Episodes, s.ShowId, s.Number)
-		}
+		query += fmt.Sprintf("UPDATE seasons SET image = '%s', episodes = %d WHERE show_id = %d AND number = %d;\n", s.Image, s.Episodes, s.ShowId, s.Number)
 	}
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)

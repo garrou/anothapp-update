@@ -18,7 +18,6 @@ func GetUsers() []models.User {
 }
 
 func toUsers(rows *sql.Rows) []models.User {
-
 	var id string
 	var users []models.User
 
