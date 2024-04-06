@@ -8,8 +8,8 @@ import (
 	"fmt"
 )
 
-func GetShows() []models.Season {
-	query := "SELECT id, poster, kinds, duration FROM shows"
+func GetShows() []models.Show {
+	query := "SELECT id, poster, kinds, duration FROM shows LIMIT 5"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
@@ -37,29 +37,30 @@ func UpdateShows(shows []models.Show) {
 	helpers.SendTelegramMessage(fmt.Sprintf("%d updated show(s)", updated))
 }
 
-func toSeasons(rows *sql.Rows) []models.Season {
+func toShows(rows *sql.Rows) []models.Show {
 
-	var number, episodes, duration, showId int
-	var image interface{}
-	var seasons []models.Season
+	var id, duration int
+	var poster string
+	var kinds interface{}
+	var shows []models.Show
 
 	for rows.Next() {
 
-		err := rows.Scan(&number, &episodes, &duration, &image, &showId)
+		err := rows.Scan(&id, &poster, &kinds, &duration)
 
 		if err != nil {
 			panic(err)
 		}
-		if image == nil {
-			image = ""
+
+		if kinds == nil {
+			kinds = ""
 		}
-		seasons = append(seasons, models.Season{
-			Number:   number,
-			Episodes: episode,
+		shows = append(shows, models.Show{
+			Id:       id,
+			Poster:   poster,
+			Kinds:    fmt.Sprintf("%s", kinds),
 			Duration: duration,
-			Image:    fmt.Sprintf("%s", image),
-			ShowId:   showId,
 		})
 	}
-	return seasons
+	return shows
 }

@@ -4,10 +4,9 @@ import (
 	"anothapp_update/database"
 	"anothapp_update/models"
 	"database/sql"
-	"fmt"
 )
 
-func GetUsers() []models.Season {
+func GetUsers() []models.User {
 	query := "SELECT id FROM users"
 	rows, err := database.Db.Query(query)
 
@@ -20,7 +19,7 @@ func GetUsers() []models.Season {
 
 func toUsers(rows *sql.Rows) []models.User {
 
-	var id int
+	var id string
 	var users []models.User
 
 	for rows.Next() {
@@ -31,7 +30,7 @@ func toUsers(rows *sql.Rows) []models.User {
 			panic(err)
 		}
 		users = append(users, models.User{
-			Id: id
+			Id: id,
 		})
 	}
 	return users

@@ -3,8 +3,8 @@ package main
 import (
 	"anothapp_update/database"
 	"anothapp_update/repositories"
-	"log"
-
+	"anothapp_update/services"
+	"fmt"
 	"github.com/joho/godotenv"
 )
 
@@ -18,11 +18,13 @@ func main() {
 	defer database.Close()
 
 	shows := repositories.GetShows()
-	seasons := repositories.GetSeasons()
+	// seasons := repositories.GetSeasons()
 	// users := repositories.GetUsers()
 
 	showsToUp := services.CompareShows(shows)
-	seasonsToUp, seasonsToDel := services.CompareSeasons(seasons)
+	// seasonsToUp, seasonsToDel := services.CompareSeasons(seasons)
 
-	fmt.Println(shows, seasons)
+	for _, show := range showsToUp {
+		fmt.Println(show)
+	}
 }

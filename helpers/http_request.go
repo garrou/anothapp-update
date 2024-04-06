@@ -2,8 +2,10 @@ package helpers
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
 )
 
 func SendTelegramMessage(message string) {

@@ -7,8 +7,8 @@ import (
 	"fmt"
 )
 
-func GetSeasons() *sql.Rows {
-	query := "SELECT number, episode, duration, image, show_id FROM seasons ORDER BY show_id, number"
+func GetSeasons() []models.Season {
+	query := "SELECT number, episodes, duration, image, show_id FROM seasons ORDER BY show_id, number"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func toSeasons(rows *sql.Rows) []models.Season {
 		}
 		seasons = append(seasons, models.Season{
 			Number:   number,
-			Episodes: episode,
+			Episodes: episodes,
 			Duration: duration,
 			Image:    fmt.Sprintf("%s", image),
 			ShowId:   showId,

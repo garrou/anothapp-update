@@ -3,6 +3,7 @@ package helpers
 import (
 	"anothapp_update/models"
 	"fmt"
+	"strings"
 )
 
 func MapToString(m map[string]string) string {
@@ -14,7 +15,6 @@ func MapToString(m map[string]string) string {
 	}
 	return strings.TrimSuffix(s, ";")
 }
-
 
 func FormatMsg(seasonsToUp []models.Season, seasonsToDel []models.Season) string {
 	return format("UPDATED", seasonsToUp) + format("DELETED", seasonsToDel)
