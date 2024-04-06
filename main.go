@@ -6,14 +6,15 @@ import (
 	"anothapp_update/repositories"
 	"anothapp_update/services"
 	"fmt"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	arg := getArg(os.Args[1:])
-	errEnv := godotenv.Load()
+	arg, mode := getArgs(os.Args[1:])
+	errEnv := godotenv.Load(getEnvFile(mode))
 
 	if errEnv != nil {
 		panic(errEnv)
@@ -34,11 +35,23 @@ func main() {
 	}
 }
 
-func getArg(args []string) string {
-	if len(args) != 1 {
+func getEnvFile(mode string) string {
+	if mode == "prod" {
+		return "production.env"
+	}
+	return ".env"
+}
+
+func getArgs(args []string) (string, string) {
+	size := len(args)
+
+	if size == 0 {
 		log.Fatal("Needs one argument")
 	}
-	return args[0]
+	if size == 2 {
+		return args[0], args[1]
+	}
+	return args[0], "dev"
 }
 
 func updateShows() {
