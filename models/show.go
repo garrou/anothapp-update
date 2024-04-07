@@ -11,7 +11,8 @@ type ShowInfo struct {
 		Status   string            `json:"status"`
 		Duration string            `json:"length"`
 		Images   struct {
-			Poster string `json:"poster"`
+			Poster interface{} `json:"poster"`
+			Show   interface{} `json:"show"`
 		} `json:"images"`
 	} `json:"show"`
 }

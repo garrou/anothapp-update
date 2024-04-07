@@ -73,7 +73,11 @@ func updateSeasons(seasons []models.Season) {
 	query := ""
 
 	for _, s := range seasons {
-		query += fmt.Sprintf("UPDATE seasons SET image = '%s', episodes = %d WHERE show_id = %d AND number = %d;\n", s.Image, s.Episodes, s.ShowId, s.Number)
+		if s.Image == "" {
+			query += fmt.Sprintf("UPDATE seasons SET episodes = %d WHERE show_id = %d AND number = %d;\n", s.Episodes, s.ShowId, s.Number)
+		} else {
+			query += fmt.Sprintf("UPDATE seasons SET image = '%s', episodes = %d WHERE show_id = %d AND number = %d;\n", s.Image, s.Episodes, s.ShowId, s.Number)
+		}
 	}
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
