@@ -32,17 +32,14 @@ func CompareShows(shows []models.Show) []models.Show {
 			}
 			kinds := helpers.MapToString(current.Show.Kinds)
 			duration, _ := strconv.Atoi(current.Show.Duration)
-			poster := current.Show.Images.Poster
+			image := current.GetImage()
 
-			if poster == nil {
-				poster = current.Show.Images.Show
-			}
-			if show.Poster != current.Show.Images.Poster || show.Duration != duration {
+			if show.Poster != image || show.Duration != duration {
 				toUpdate = append(toUpdate, models.Show{
 					Id:       current.Show.Id,
 					Title:    current.Show.Title,
 					Kinds:    kinds,
-					Poster:   fmt.Sprintf("%s", poster),
+					Poster:   image,
 					Duration: duration,
 				})
 			}

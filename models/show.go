@@ -13,8 +13,28 @@ type ShowInfo struct {
 		Images   struct {
 			Poster interface{} `json:"poster"`
 			Show   interface{} `json:"show"`
+			Banner interface{} `json:"banner"`
+			Box    interface{} `json:"box"`
 		} `json:"images"`
 	} `json:"show"`
+}
+
+func (s ShowInfo) GetImage() string {
+	images := s.Show.Images
+
+	if images.Poster != nil {
+		return fmt.Sprintf("%s", images.Poster)
+	}
+	if images.Show != nil {
+		return fmt.Sprintf("%s", images.Show)
+	}
+	if images.Banner != nil {
+		return fmt.Sprintf("%s", images.Banner)
+	}
+	if images.Box != nil {
+		return fmt.Sprintf("%s", images.Box)
+	}
+	return ""
 }
 
 type Show struct {

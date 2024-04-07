@@ -28,7 +28,7 @@ func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) {
 
 func toSeasons(rows *sql.Rows) []models.Season {
 	var number, episodes, duration, showId int
-	var image interface{}
+	var image string
 	var seasons []models.Season
 
 	for rows.Next() {
@@ -38,14 +38,11 @@ func toSeasons(rows *sql.Rows) []models.Season {
 		if err != nil {
 			panic(err)
 		}
-		if image == nil {
-			image = ""
-		}
 		seasons = append(seasons, models.Season{
 			Number:   number,
 			Episodes: episodes,
 			Duration: duration,
-			Image:    fmt.Sprintf("%s", image),
+			Image:    image,
 			ShowId:   showId,
 		})
 	}
