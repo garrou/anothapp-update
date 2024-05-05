@@ -71,12 +71,13 @@ func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) 
 		}
 		currSeason := current.Seasons[season.Number-1]
 
-		if season.Number == currSeason.Number && (season.Episodes != currSeason.Episodes || season.Image != currSeason.Image) {
+		if season.Number == currSeason.Number && (season.Episodes != currSeason.Episodes || (currSeason.Image != "" && season.Image != currSeason.Image)) {
 			toUpdate = append(toUpdate, models.Season{
 				ShowId:   season.ShowId,
 				Number:   currSeason.Number,
 				Episodes: currSeason.Episodes,
 				Image:    currSeason.Image,
+				Duration: season.Duration,
 			})
 		}
 		previous = season.ShowId

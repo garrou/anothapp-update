@@ -7,10 +7,10 @@ type SeasonInfos struct {
 }
 
 type Season struct {
-	Number   int
-	Episodes int
+	Number   int `json:"number"`
+	Episodes int `json:"episodes"`
 	Duration int
-	Image    string
+	Image    string `json:"image"`
 	ShowId   int
 }
 
