@@ -34,7 +34,7 @@ func CompareShows(shows []models.Show) []models.Show {
 			duration, _ := strconv.Atoi(current.Show.Duration)
 			image := current.GetImage()
 
-			if show.Poster != image || show.Duration != duration {
+			if show.Poster != image || (duration != 0 && show.Duration != duration) {
 				toUpdate = append(toUpdate, models.Show{
 					Id:       current.Show.Id,
 					Title:    current.Show.Title,
