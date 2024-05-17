@@ -20,5 +20,5 @@ func Format[T any](title string, items []T) string {
 	for _, item := range items {
 		s += fmt.Sprintln(item)
 	}
-	return s
+	return fmt.Sprintln(s)
 }
