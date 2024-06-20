@@ -8,7 +8,7 @@ import (
 )
 
 func GetShows() []models.Show {
-	query := "SELECT id, title, poster, kinds, duration FROM shows"
+	query := "SELECT id, title, poster, kinds, duration, seasons FROM shows"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
@@ -25,7 +25,7 @@ func UpdateShows(shows []models.Show) {
 	query := ""
 
 	for _, s := range shows {
-		query += fmt.Sprintf("UPDATE shows SET kinds = '%s', poster = '%s', duration = %d WHERE id = %d;\n", s.Kinds, s.Poster, s.Duration, s.Id)
+		query += fmt.Sprintf("UPDATE shows SET kinds = '%s', poster = '%s', duration = %d, seasons = %d WHERE id = %d;\n", s.Kinds, s.Poster, s.Duration, s.Seasons, s.Id)
 	}
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
@@ -33,14 +33,14 @@ func UpdateShows(shows []models.Show) {
 }
 
 func toShows(rows *sql.Rows) []models.Show {
-	var id, duration int
+	var id, duration, seasons int
 	var title, poster string
 	var kinds interface{}
 	var shows []models.Show
 
 	for rows.Next() {
 
-		err := rows.Scan(&id, &title, &poster, &kinds, &duration)
+		err := rows.Scan(&id, &title, &poster, &kinds, &duration, &seasons)
 
 		if err != nil {
 			panic(err)
@@ -52,6 +52,7 @@ func toShows(rows *sql.Rows) []models.Show {
 			Poster:   poster,
 			Kinds:    fmt.Sprintf("%s", kinds),
 			Duration: duration,
+			Seasons:  seasons,
 		})
 	}
 	return shows

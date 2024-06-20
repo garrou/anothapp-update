@@ -43,6 +43,7 @@ type Show struct {
 	Poster   string
 	Kinds    string
 	Duration int
+	Seasons  int
 }
 
 func (s Show) String() string {
