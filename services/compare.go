@@ -35,7 +35,7 @@ func CompareShows(shows []models.Show) []models.Show {
 			seasons, _ := strconv.Atoi(current.Show.Seasons)
 			image := current.GetImage()
 
-			if show.Poster != image || show.Seasons != seasons || (duration != 0 && show.Duration != duration) {
+			if show.Poster != image || show.Seasons != seasons || show.Country != current.Show.Country || (duration != 0 && show.Duration != duration) {
 				toUpdate = append(toUpdate, models.Show{
 					Id:       current.Show.Id,
 					Title:    current.Show.Title,
@@ -43,6 +43,7 @@ func CompareShows(shows []models.Show) []models.Show {
 					Poster:   image,
 					Duration: duration,
 					Seasons:  seasons,
+					Country:  current.Show.Country,
 				})
 			}
 		}(show)
@@ -79,7 +80,6 @@ func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) 
 				Number:   currSeason.Number,
 				Episodes: currSeason.Episodes,
 				Image:    currSeason.Image,
-				Duration: season.Duration,
 			})
 		}
 		previous = season.ShowId

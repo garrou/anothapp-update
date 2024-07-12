@@ -10,6 +10,7 @@ type ShowInfo struct {
 		Seasons  string            `json:"seasons"`
 		Status   string            `json:"status"`
 		Duration string            `json:"length"`
+		Country  string            `json:"country"`
 		Images   struct {
 			Poster interface{} `json:"poster"`
 			Show   interface{} `json:"show"`
@@ -44,6 +45,7 @@ type Show struct {
 	Kinds    string
 	Duration int
 	Seasons  int
+	Country  string
 }
 
 func (s Show) String() string {

@@ -8,7 +8,7 @@ import (
 )
 
 func GetSeasons() []models.Season {
-	query := "SELECT number, episodes, duration, image, show_id FROM seasons ORDER BY show_id, number"
+	query := "SELECT number, episodes, image, show_id FROM seasons ORDER BY show_id, number"
 	rows, err := database.Db.Query(query)
 
 	if err != nil {
@@ -27,13 +27,13 @@ func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) {
 }
 
 func toSeasons(rows *sql.Rows) []models.Season {
-	var number, episodes, duration, showId int
+	var number, episodes, showId int
 	var image string
 	var seasons []models.Season
 
 	for rows.Next() {
 
-		err := rows.Scan(&number, &episodes, &duration, &image, &showId)
+		err := rows.Scan(&number, &episodes, &image, &showId)
 
 		if err != nil {
 			panic(err)
@@ -41,7 +41,6 @@ func toSeasons(rows *sql.Rows) []models.Season {
 		seasons = append(seasons, models.Season{
 			Number:   number,
 			Episodes: episodes,
-			Duration: duration,
 			Image:    image,
 			ShowId:   showId,
 		})
