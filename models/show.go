@@ -7,7 +7,7 @@ type ShowInfo struct {
 		Id       int               `json:"id"`
 		Title    string            `json:"title"`
 		Kinds    map[string]string `json:"genres"`
-		Seasons  string            `json:"seasons"`
+		Seasons  []interface{}     `json:"seasons_details"`
 		Status   string            `json:"status"`
 		Duration string            `json:"length"`
 		Country  string            `json:"country"`
