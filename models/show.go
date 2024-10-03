@@ -2,6 +2,10 @@ package models
 
 import "fmt"
 
+type Stringer interface {
+	String() string
+}
+
 type ShowInfo struct {
 	Show struct {
 		Id       int               `json:"id"`

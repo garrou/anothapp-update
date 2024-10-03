@@ -3,12 +3,11 @@ package main
 import (
 	"anothapp_update/database"
 	"anothapp_update/helpers"
+	"anothapp_update/models"
 	"anothapp_update/repositories"
 	"anothapp_update/services"
-	"fmt"
 	"github.com/joho/godotenv"
 	"os"
-	"time"
 )
 
 func main() {
@@ -21,10 +20,10 @@ func main() {
 	database.Open()
 	defer database.Close()
 
-	filename := fmt.Sprintf("logs/%s.txt", time.Now().Format("20060102"))
-	helpers.Write(filename, fmt.Sprintf("File %s\n\n", mode))
-	updateShows(filename)
-	updateSeasons(filename)
+	updatedShows := updateShows()
+	updatedSeasons, deletedSeasons := updateSeasons()
+
+	helpers.SendTelegramMessage(helpers.FormatMessage(updatedShows, updatedSeasons, deletedSeasons))
 }
 
 func getEnvFile(args []string) string {
@@ -34,19 +33,16 @@ func getEnvFile(args []string) string {
 	return ".env"
 }
 
-func updateShows(filename string) {
+func updateShows() []models.Show {
 	shows := repositories.GetShows()
 	showsToUp := services.CompareShows(shows)
 	repositories.UpdateShows(showsToUp)
-
-	helpers.Write(filename, helpers.Format("Series updated", showsToUp))
+	return showsToUp
 }
 
-func updateSeasons(filename string) {
+func updateSeasons() ([]models.Season, []models.Season) {
 	seasons := repositories.GetSeasons()
 	seasonsToUp, seasonsToDel := services.CompareSeasons(seasons)
 	repositories.UpdateSeasons(seasonsToUp, seasonsToDel)
-
-	msg := fmt.Sprint(helpers.Format("Seasons updated", seasonsToUp), helpers.Format("Seasons deleted", seasonsToDel))
-	helpers.Write(filename, msg)
+	return seasonsToUp, seasonsToDel
 }
