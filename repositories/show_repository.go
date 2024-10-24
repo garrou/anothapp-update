@@ -49,7 +49,7 @@ func deleteShows(shows []models.Show) {
 	query := ""
 
 	for _, s := range shows {
-		query += fmt.Sprintf("DELETE shows WHERE id = %d;\n", s.Id)
+		query += fmt.Sprintf("DELETE FROM shows WHERE id = %d;\n", s.Id)
 	}
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
