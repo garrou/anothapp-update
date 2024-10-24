@@ -17,25 +17,25 @@ func SendTelegramMessage(message string) {
 	httpPost(url, body)
 }
 
-func HttpGet(url, key string) []byte {
+func HttpGet(url, key string) ([]byte, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	req.Header.Set("X-BetaSeries-Key", key)
 	resp, getErr := client.Do(req)
 
 	if getErr != nil {
-		panic(getErr)
+		return nil, getErr
 	}
 	body, bodyErr := io.ReadAll(resp.Body)
 
 	if bodyErr != nil {
-		panic(bodyErr)
+		return nil, bodyErr
 	}
-	return body
+	return body, nil
 }
 
 func httpPost(url string, body *bytes.Buffer) {

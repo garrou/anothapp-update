@@ -20,10 +20,9 @@ func main() {
 	database.Open()
 	defer database.Close()
 
-	updatedShows := updateShows()
+	updatedShows, deletedShows := updateShows()
 	updatedSeasons, deletedSeasons := updateSeasons()
-
-	helpers.SendTelegramMessage(helpers.FormatMessage(updatedShows, updatedSeasons, deletedSeasons))
+	helpers.SendTelegramMessage(helpers.FormatMessage(updatedShows, deletedShows, updatedSeasons, deletedSeasons))
 }
 
 func getEnvFile(args []string) string {
@@ -33,11 +32,11 @@ func getEnvFile(args []string) string {
 	return ".env"
 }
 
-func updateShows() []models.Show {
+func updateShows() ([]models.Show, []models.Show) {
 	shows := repositories.GetShows()
-	showsToUp := services.CompareShows(shows)
-	repositories.UpdateShows(showsToUp)
-	return showsToUp
+	showsToUp, showsToDelete := services.CompareShows(shows)
+	repositories.UpdateShows(showsToUp, showsToDelete)
+	return showsToUp, showsToDelete
 }
 
 func updateSeasons() ([]models.Season, []models.Season) {

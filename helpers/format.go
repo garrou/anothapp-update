@@ -15,21 +15,19 @@ func MapToString(m map[string]string) string {
 	return strings.TrimSuffix(s, ";")
 }
 
-func FormatMessage(shows []models.Show, updated []models.Season, deleted []models.Season) string {
-	message := fmt.Sprintf("%d shows updated\n", len(shows))
+func FormatMessage(updatedShows []models.Show, deletedShows []models.Show, updatedSeasons []models.Season, deletedSeasons []models.Season) string {
+	return strings.Join([]string{
+		createMessage("shows updated", updatedShows),
+		createMessage("shows deleted", deletedShows),
+		createMessage("seasons updated", updatedSeasons),
+		createMessage("seasons deleted", deletedSeasons),
+	}, "\n")
+}
 
-	for _, show := range shows {
+func createMessage[T models.Stringer](title string, toWrite []T) string {
+	message := fmt.Sprintf("%d %s\n", len(toWrite), title)
+	for _, show := range toWrite {
 		message += format(show)
-	}
-	message += fmt.Sprintf("%d seasons updated\n", len(updated))
-
-	for _, season := range updated {
-		message += format(season)
-	}
-	message += fmt.Sprintf("%d seasons deleted\n", len(deleted))
-
-	for _, season := range deleted {
-		message += format(season)
 	}
 	return message
 }

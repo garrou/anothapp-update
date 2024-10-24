@@ -12,8 +12,9 @@ import (
 
 const BaseUrl = "https://api.betaseries.com/shows"
 
-func CompareShows(shows []models.Show) []models.Show {
+func CompareShows(shows []models.Show) ([]models.Show, []models.Show) {
 	var toUpdate []models.Show
+	var toDelete []models.Show
 	var wg sync.WaitGroup
 	var apiKey = os.Getenv("BETASERIES_KEY")
 
@@ -21,14 +22,21 @@ func CompareShows(shows []models.Show) []models.Show {
 		wg.Add(1)
 		go func(show models.Show) {
 			defer wg.Done()
-			body := helpers.HttpGet(fmt.Sprintf("%s/display?id=%d", BaseUrl, show.Id), apiKey)
+			body, err := helpers.HttpGet(fmt.Sprintf("%s/display?id=%d", BaseUrl, show.Id), apiKey)
+
+			if err != nil {
+				helpers.SendTelegramMessage(fmt.Sprintf("Error while fetching show %d, reason %v", show.Id, err))
+				panic(err)
+			}
 			current := models.ShowInfo{}
 
 			if showErr := json.Unmarshal(body, &current); showErr != nil {
+				helpers.SendTelegramMessage(fmt.Sprintf("Error during deserialize show %d, reason %v", show.Id, showErr))
 				panic(showErr)
 			}
 			if current.Show.Id == 0 {
-				panic("Error during deserialization")
+				toDelete = append(toDelete, show)
+				return
 			}
 			kinds := helpers.MapToString(current.Show.Kinds)
 			duration, _ := strconv.Atoi(current.Show.Duration)
@@ -52,7 +60,7 @@ func CompareShows(shows []models.Show) []models.Show {
 		}(show)
 	}
 	wg.Wait()
-	return toUpdate
+	return toUpdate, toDelete
 }
 
 func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) {
@@ -64,10 +72,16 @@ func CompareSeasons(seasons []models.Season) ([]models.Season, []models.Season) 
 
 	for _, season := range seasons {
 		if season.ShowId != previous {
-			body := helpers.HttpGet(fmt.Sprintf("%s/seasons?id=%d", BaseUrl, season.ShowId), apiKey)
+			body, getErr := helpers.HttpGet(fmt.Sprintf("%s/seasons?id=%d", BaseUrl, season.ShowId), apiKey)
+
+			if getErr != nil {
+				helpers.SendTelegramMessage(fmt.Sprintf("Error with season %d, reason %v", season.ShowId, getErr))
+				panic(getErr)
+			}
 			current.Seasons = nil
 
 			if err := json.Unmarshal(body, &current); err != nil {
+				helpers.SendTelegramMessage(fmt.Sprintf("Error during deserialize seasons of show %d, reason %v", season.ShowId, err))
 				panic(err)
 			}
 		}

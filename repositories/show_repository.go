@@ -18,7 +18,15 @@ func GetShows() []models.Show {
 	return toShows(rows)
 }
 
-func UpdateShows(shows []models.Show) {
+func UpdateShows(toUpdate []models.Show, toDelete []models.Show) {
+	if len(toUpdate)+len(toDelete) == 0 {
+		return
+	}
+	updateShows(toUpdate)
+	deleteShows(toDelete)
+}
+
+func updateShows(shows []models.Show) {
 	if len(shows) == 0 {
 		return
 	}
@@ -28,6 +36,20 @@ func UpdateShows(shows []models.Show) {
 		query += fmt.Sprintf(
 			"UPDATE shows SET kinds = '%s', poster = '%s', duration = %d, seasons = %d, country = '%s' WHERE id = %d;\n",
 			s.Kinds, s.Poster, s.Duration, s.Seasons, s.Country, s.Id)
+	}
+	if _, err := database.Db.Query(query); err != nil {
+		panic(err)
+	}
+}
+
+func deleteShows(shows []models.Show) {
+	if len(shows) == 0 {
+		return
+	}
+	query := ""
+
+	for _, s := range shows {
+		query += fmt.Sprintf("DELETE shows WHERE id = %d;\n", s.Id)
 	}
 	if _, err := database.Db.Query(query); err != nil {
 		panic(err)
