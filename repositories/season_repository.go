@@ -24,6 +24,7 @@ func UpdateSeasons(toUpdate []models.Season, toDelete []models.Season) {
 	}
 	deleteSeasons(toDelete)
 	updateSeasons(toUpdate)
+	updateSeasonsImage()
 }
 
 func toSeasons(rows *sql.Rows) []models.Season {
@@ -76,6 +77,15 @@ func updateSeasons(seasons []models.Season) {
 		}
 	}
 	if _, err := database.Db.Query(query); err != nil {
+		panic(err)
+	}
+}
+
+func updateSeasonsImage() {
+	if _, err := database.Db.Query(`
+		UPDATE seasons se
+		SET image = (SELECT poster FROM shows s WHERE s.id = se.show_id)
+		WHERE image IS NULL OR image = ''`); err != nil {
 		panic(err)
 	}
 }

@@ -16,18 +16,24 @@ func MapToString(m map[string]string) string {
 }
 
 func FormatMessage(updatedShows []models.Show, deletedShows []models.Show, updatedSeasons []models.Season, deletedSeasons []models.Season) string {
-	return strings.Join([]string{
-		createMessage("shows updated", updatedShows),
-		createMessage("shows deleted", deletedShows),
-		createMessage("seasons updated", updatedSeasons),
-		createMessage("seasons deleted", deletedSeasons),
-	}, "\n")
-}
-
-func createMessage[T models.Stringer](title string, toWrite []T) string {
-	message := fmt.Sprintf("%d %s\n", len(toWrite), title)
-	for _, show := range toWrite {
+	message := fmt.Sprintf("%d shows updated\n", len(updatedShows))
+	for _, show := range updatedShows {
 		message += format(show)
+	}
+
+	message += fmt.Sprintf("%d shows deleted\n", len(deletedShows))
+	for _, show := range deletedShows {
+		message += format(show)
+	}
+
+	message += fmt.Sprintf("%d seasons updated\n", len(updatedSeasons))
+	for _, season := range updatedSeasons {
+		message += format(season)
+	}
+
+	message += fmt.Sprintf("%d seasons deleted\n", len(deletedSeasons))
+	for _, season := range deletedSeasons {
+		message += format(season)
 	}
 	return message
 }
