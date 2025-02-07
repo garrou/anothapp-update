@@ -32,22 +32,21 @@ func CompareShows(shows []models.Show) ([]models.Show, []models.Show) {
 			continue
 		}
 		kinds := helpers.MapToString(current.Show.Kinds)
-		duration, _ := strconv.Atoi(current.Show.Duration)
+		numDuration, _ := strconv.Atoi(current.Show.Duration)
+		duration := helpers.Ternary(numDuration != 0, numDuration, show.Duration)
+		country := helpers.Ternary(current.Show.Country == "", show.Country, current.Show.Country)
 		seasons := len(current.Show.Seasons)
 		image := current.GetImage()
 
-		if show.Poster != image ||
-			show.Seasons != seasons ||
-			show.Country != current.Show.Country ||
-			(duration != 0 && show.Duration != duration) {
+		if show.Poster != image || show.Seasons != seasons || show.Country != country || show.Duration != duration {
 			toUpdate = append(toUpdate, models.Show{
 				Id:       current.Show.Id,
 				Title:    current.Show.Title,
 				Kinds:    kinds,
 				Poster:   image,
-				Duration: duration,
+				Duration: duration.(int),
 				Seasons:  seasons,
-				Country:  current.Show.Country,
+				Country:  country.(string),
 			})
 		}
 	}

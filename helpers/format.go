@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+func Ternary(condition bool, trueVal, falseVal interface{}) interface{} {
+	if condition {
+		return trueVal
+	}
+	return falseVal
+}
+
 func MapToString(m map[string]string) string {
 	s := ""
 
